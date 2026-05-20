@@ -1,16 +1,24 @@
-/* ==========================================================================
-   ОБЩИЕ СТИЛИ И ПЕРЕМЕННЫЕ (Дорогой Dark Mode)
-   ========================================================================== */
+
 :root {
-  --bg-main: #0b0f19;          /* Глубокий космический черный */
-  --bg-sidebar: #111827;       /* Благородный темный для сайдбара */
-  --bg-card-user: #1f2937;     /* Тон графита для сообщений пользователя */
-  --bg-card-ai: #161d30;       /* Тон ночного неба для сообщений ИИ */
-  --border-color: #24324f;     /* Тонкие полупрозрачные границы */
-  --text-primary: #f3f4f6;     /* Мягкий белый текст, не режущий глаза */
-  --text-secondary: #9ca3af;   /* Дорогой серый для второстепенного текста */
-  --accent-blue: #3b82f6;      /* Электрический синий для акцентов */
-  --accent-glow: rgba(59, 130, 246, 0.15);
+  --bg-main: #030712;        
+  --bg-sidebar: #0b0f19;       
+  --bg-card-user: #111827;     
+  --bg-card-ai: rgba(22, 29, 48, 0.4); 
+  --border-color: rgba(36, 50, 79, 0.4); 
+  --text-primary: #f9fafb;    
+  --text-secondary: #9ca3af;   
+  --accent-blue: #6366f1;     
+  --accent-glow: rgba(99, 102, 241, 0.12);
+  
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --font-premium: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: var(--bg-main);
 }
 
 .search-container {
@@ -18,13 +26,25 @@
   height: 100vh;
   background-color: var(--bg-main);
   color: var(--text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-premium);
+  letter-spacing: -0.01em;
   overflow: hidden;
+  position: relative;
 }
 
-/* ==========================================================================
-   ЛЕВАЯ ПАНЕЛЬ (САЙДБАР)
-   ========================================================================== */
+.search-container::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.05) 0%, rgba(3, 7, 18, 0) 70%);
+  z-index: 0;
+  pointer-events: none;
+}
+
 .search-sidebar {
   width: 280px;
   background-color: var(--bg-sidebar);
@@ -32,66 +52,65 @@
   flex-direction: column;
   border-right: 1px solid var(--border-color);
   flex-shrink: 0;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 10;
 }
 
 .search-sidebar-header {
-  padding: 1.25rem;
+  padding: 1.5rem 1.25rem;
 }
 
-/* Кнопка "Новая беседа" с эффектом свечения */
 .new-chat-btn {
   width: 100%;
-  padding: 0.75rem 1rem;
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  padding: 0.85rem 1.25rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 100%), #111827;
   color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  gap: 0.6rem;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .new-chat-btn:hover {
-  border-color: var(--accent-blue);
-  box-shadow: 0 0 12px var(--accent-glow);
+  border-color: rgba(99, 102, 241, 0.4);
+  background-color: #151d30;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 0 20px var(--accent-glow);
   transform: translateY(-1px);
 }
 
 .search-history-list {
   flex: 1;
   overflow-y: auto;
-  padding: 0.5rem 0.8rem;
+  padding: 0.5rem 0.75rem;
 }
 
-/* Элемент истории */
 .search-history-item {
-  padding: 0.85rem 1rem;
-  border-radius: 10px;
-  margin-bottom: 0.4rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: 12px;
+  margin-bottom: 0.25rem;
   cursor: pointer;
   border: 1px solid transparent;
   transition: all 0.2s ease;
 }
 
 .search-history-item:hover {
-  background-color: rgba(255, 255, 255, 0.03);
+  background-color: rgba(255, 255, 255, 0.02);
 }
 
-/* Активный выбранный чат */
 .search-history-item.active-chat {
-  background: linear-gradient(90deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.02) 100%);
-  border-color: rgba(59, 130, 246, 0.3);
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.06) 0%, rgba(99, 102, 241, 0.01) 100%);
+  border-color: rgba(99, 102, 241, 0.2);
 }
 
 .search-history-question {
-  margin: 0 0 0.25rem 0;
+  margin: 0 0 0.3rem 0;
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--text-primary);
@@ -103,15 +122,61 @@
 .search-history-answer {
   margin: 0;
   font-size: 0.75rem;
-  color: var(--text-secondary);
+  color: #6b7280;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* ==========================================================================
-   ОСНОВНОЙ КОНТЕНТ И ОКНО ДИАЛОГА
-   ========================================================================== */
+
+.search-sidebar-footer {
+  padding: 1.25rem;
+  border-top: 1px solid var(--border-color);
+  background-color: rgba(3, 7, 18, 0.2);
+}
+
+.clear-history-btn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  color: #ef4444; 
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  border-radius: 12px;
+  font-weight: 500;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0.65; 
+}
+
+.clear-history-btn:hover {
+  opacity: 1;
+  background-color: rgba(239, 68, 68, 0.06);
+  border-color: rgba(239, 68, 68, 0.4);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.05);
+  transform: translateY(-1px);
+}
+
+.clear-history-btn:active {
+  transform: translateY(0);
+  background-color: rgba(239, 68, 68, 0.12);
+}
+
+.search-icon-trash {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
+}
+
+.clear-history-btn:hover .search-icon-trash {
+  transform: rotate(-5deg) scale(1.05);
+}
+
+
 .search-main-content {
   flex: 1;
   display: flex;
@@ -119,35 +184,35 @@
   position: relative;
   height: 100%;
   background-color: var(--bg-main);
+  z-index: 1;
 }
 
 .search-response-area {
   flex: 1;
   overflow-y: auto;
-  padding: 2rem 2rem 10rem 2rem; /* Отступ снизу больше, чтобы текст не заходил под инпут */
+  padding: 3rem 2rem 12rem 2rem;
 }
 
 .search-response-wrapper {
-  max-w: 800px;
+  max-w: 760px; 
   margin: 0 auto;
   width: 100%;
 }
 
-/* Экран приветствия */
 .search-welcome-zone {
   text-align: center;
-  padding-top: 20vh;
-  animation: fadeIn 0.6s ease-out;
+  padding-top: 18vh;
+  animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .search-welcome-title {
-  font-size: 2.25rem;
+  font-size: 2.5rem;
   font-weight: 700;
-  letter-spacing: -0.03em;
-  background: linear-gradient(135deg, #fff 30%, #94a3b8 100%);
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, #ffffff 40%, #64748b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .search-welcome-subtitle {
@@ -155,89 +220,149 @@
   font-size: 0.95rem;
 }
 
-/* Список пузырей переписки */
 .chat-messages-list {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
-/* Базовый стиль пузыря */
 .message-bubble {
-  padding: 1.25rem 1.5rem;
-  border-radius: 18px;
+  padding: 1.5rem 1.75rem;
+  border-radius: 20px;
   max-w: 85%;
-  line-height: 1.6;
+  line-height: 1.65;
   font-size: 0.95rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  animation: messageSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  animation: messageSlideIn 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
 }
 
-/* Пузырь пользователя */
+
 .message-bubble.user {
   background-color: var(--bg-card-user);
   align-self: flex-end;
   border-bottom-right-radius: 4px;
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
 }
 
-/* Пузырь искусственного интеллекта */
 .message-bubble.assistant {
   background-color: var(--bg-card-ai);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   align-self: flex-start;
   border-bottom-left-radius: 4px;
   color: #e5e7eb;
   border: 1px solid var(--border-color);
 }
 
-/* Метки над текстом (Вы / Ответ ИИ) */
 .message-badge {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 0.6rem;
-  color: var(--text-secondary);
+  letter-spacing: 0.12em;
+  margin-bottom: 0.75rem;
+  color: #6b7280;
 }
 
 .message-bubble.user .message-badge {
-  color: #60a5fa;
+  color: var(--accent-blue);
   text-align: right;
 }
 
 .search-result-text {
   margin: 0;
   font-size: 0.95rem;
-  white-space: pre-wrap;
 }
 
-/* Лоадер генерации */
 .search-loader-zone {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   color: var(--text-secondary);
   font-size: 0.85rem;
   padding: 1rem 0.5rem;
-  animation: pulse 1.5s infinite ease-in-out;
+  animation: pulse 2s infinite ease-in-out;
 }
 
-/* ==========================================================================
-   НИЖНЯЯ ПАНЕЛЬ И ВВОД (Парящая премиум-панель)
-   ========================================================================== */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-top-color: var(--accent-blue);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+
+.search-result-text pre {
+  max-height: 400px; 
+  overflow: auto;
+  background-color: #070a12 !important; 
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 14px;
+  margin: 1.25rem 0;
+  padding: 1.25rem;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.search-result-text code {
+  font-family: "SF Mono", "Fira Code", Monaco, Consolas, monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #e5e7eb;
+}
+
+
+.search-result-text :not(pre) > code {
+  background-color: rgba(255, 255, 255, 0.07);
+  padding: 0.2rem 0.45rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  color: #f43f5e; 
+}
+
+.search-result-text h1, 
+.search-result-text h2, 
+.search-result-text h3 {
+  color: #ffffff;
+  margin: 1.5rem 0 0.5rem 0;
+  letter-spacing: -0.02em;
+}
+.search-result-text h1 { font-size: 1.5rem; }
+.search-result-text h2 { font-size: 1.3rem; }
+.search-result-text h3 { font-size: 1.15rem; font-weight: 600; }
+
+.search-result-text p {
+  margin: 0 0 1rem 0;
+  color: #d1d5db;
+}
+
+.search-result-text ul, 
+.search-result-text ol {
+  margin: 0 0 1.25rem 0;
+  padding-left: 1.25rem;
+  color: #d1d5db;
+}
+
+.search-result-text li {
+  margin-bottom: 0.4rem;
+}
+
+
 .search-input-area {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  /* Мягкое дорогое размытие за полем ввода */
-  background: linear-gradient(to top, var(--bg-main) 60%, rgba(11, 15, 25, 0));
-  padding: 2rem 2rem 2rem 2rem;
+  background: linear-gradient(to top, var(--bg-main) 70%, rgba(3, 7, 18, 0));
+  padding: 3rem 2rem 2.5rem 2rem;
+  z-index: 3;
 }
 
 .search-form-container {
-  max-width: 800px;
+  max-width: 760px;
   margin: 0 auto;
 }
 
@@ -247,68 +372,64 @@
   align-items: center;
 }
 
-/* Текстовое поле */
 .search-input-field {
   width: 100%;
-  padding: 1.1rem 4rem 1.1rem 1.5rem;
-  background-color: #111827;
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
+  padding: 1.25rem 4.5rem 1.25rem 1.75rem;
+  background-color: rgba(17, 24, 39, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
   color: var(--text-primary);
   font-size: 1rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  transition: all 0.25s ease;
+  font-family: var(--font-premium);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   box-sizing: border-box;
 }
 
 .search-input-field:focus {
   outline: none;
-  border-color: var(--accent-blue);
-  background-color: #151d30;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(59, 130, 246, 0.15);
+  border-color: rgba(99, 102, 241, 0.4);
+  background-color: rgba(17, 24, 39, 0.9);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(99, 102, 241, 0.1);
 }
 
 .search-input-field::placeholder {
   color: #4b5563;
 }
 
-/* Стиль ошибки инпута */
 .search-input-error {
-  border-color: rgba(239, 68, 68, 0.5);
+  border-color: rgba(239, 68, 68, 0.4);
 }
 
-.search-input-error:focus {
-  border-color: #ef4444;
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
-}
-
-/* Минималистичная круглая кнопка отправки */
 .search-submit-button {
   position: absolute;
-  right: 0.75rem;
-  background-color: var(--text-primary); /* Белая кнопка на темном фоне */
-  color: var(--bg-main);
+  right: 0.85rem;
+  background-color: #ffffff;
+  color: #000000;
   border: none;
   border-radius: 50%;
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 }
 
 .search-submit-button:hover:not(:disabled) {
-  background-color: #ffffff;
-  transform: scale(1.05);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+  transform: scale(1.05) translateY(-1px);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25);
 }
 
 .search-submit-button:disabled {
-  background-color: #1f2937;
+  background-color: rgba(255, 255, 255, 0.04);
   color: #4b5563;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 .search-icon {
@@ -316,60 +437,126 @@
   height: 18px;
 }
 
-/* Ошибки валидации под формой */
 .search-feedback-container {
-  margin-top: 0.5rem;
+  margin-top: 0.6rem;
   min-height: 20px;
-  padding: 0 0.5rem;
+  padding: 0 0.75rem;
 }
 
 .search-error-text {
   color: #f87171;
   font-size: 0.8rem;
-  font-weight: 500;
-  display: block;
 }
 
-/* ==========================================================================
-   АНИМАЦИИ И СКРОЛЛБАРЫ
-   ========================================================================== */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
 
-@keyframes messageSlideIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
-}
-
-/* Кастомный элегантный скроллбар */
 .search-history-list::-webkit-scrollbar,
-.search-response-area::-webkit-scrollbar {
+.search-response-area::-webkit-scrollbar,
+.search-result-text pre::-webkit-scrollbar {
   width: 5px;
+  height: 5px;
 }
 
-.search-history-list::-webkit-scrollbar-track,
-.search-response-area::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.search-history-list::-webkit-scrollbar-thumb {
-  background-color: #1f2937;
-  border-radius: 10px;
-}
-
-.search-response-area::-webkit-scrollbar-thumb {
-  background-color: #24324f;
+.search-history-list::-webkit-scrollbar-thumb,
+.search-response-area::-webkit-scrollbar-thumb,
+.search-result-text pre::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.08);
   border-radius: 10px;
 }
 
 .search-history-list::-webkit-scrollbar-thumb:hover,
-.search-response-area::-webkit-scrollbar-thumb:hover {
-  background-color: var(--accent-blue);
+.search-response-area::-webkit-scrollbar-thumb:hover,
+.search-result-text pre::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes messageSlideIn {
+  from { opacity: 0; transform: translateY(16px) scale(0.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+
+@media (max-width: 1024px) {
+ 
+  .search-sidebar {
+    width: 240px;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .search-container {
+    flex-direction: column;
+  }
+
+  .search-sidebar { 
+    position: fixed; 
+    left: -100%; 
+    top: 0; 
+    bottom: 0; 
+    width: 280px;
+    box-shadow: 20px 0 60px rgba(0, 0, 0, 0.8);
+    z-index: 999; 
+  }
+
+
+  .search-sidebar.open {
+    left: 0;
+  }
+
+  .search-response-area { 
+    padding: 1.5rem 1rem 10rem 1rem; 
+  }
+
+  .search-input-area { 
+    padding: 1.5rem 1rem 1.5rem 1rem;
+    background: linear-gradient(to top, var(--bg-main) 85%, rgba(3, 7, 18, 0));
+  }
+
+  .message-bubble { 
+    max-width: 95%; 
+    padding: 1.25rem; 
+    border-radius: 16px;
+  }
+
+  .search-welcome-zone { 
+    padding-top: 10vh; 
+  }
+
+  .search-welcome-title { 
+    font-size: 2rem; 
+    letter-spacing: -0.03em;
+  }
+
+  .search-input-field {
+    padding: 1.1rem 4rem 1.1rem 1.25rem;
+    font-size: 0.95rem;
+    border-radius: 16px;
+  }
+
+  .search-submit-button {
+    right: 0.65rem;
+    width: 38px;
+    height: 38px;
+  }
+
+ 
+  .search-result-text pre {
+    max-height: 280px;
+    padding: 0.9rem;
+    border-radius: 10px;
+  }
 }

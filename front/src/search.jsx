@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useForm } from "react-hook-form"
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
+import ReactMarkdown from 'react-markdown'
 import AiApi from "./ai-api"
 import Loader from "./loader"
 import './search.css' 
@@ -13,26 +14,28 @@ const schema = yup.object({
 function Search() {
     const [error, setError] = useState('')
     const [loader, setLoader] = useState(false)
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false) // Состояние мобильного сайдбара
+    const responseAreaRef = useRef(null)
 
-   
+    // Синхронизация истории чатов
     const [history, setHistory] = useState(() => {
         const savedHistory = localStorage.getItem('chat_history')
         return savedHistory ? JSON.parse(savedHistory) : []
     })
 
-    
+    // ID текущей активной сессии
     const [currentChatId, setCurrentChatId] = useState(() => {
         const savedId = localStorage.getItem('current_chat_id')
         return savedId ? JSON.parse(savedId) : null
     })
 
-    
+    // Текущие сообщения на экране
     const [messages, setMessages] = useState(() => {
         const savedMessages = localStorage.getItem('current_messages')
         return savedMessages ? JSON.parse(savedMessages) : []
     })
 
-    
+    // Сохранение состояний в LocalStorage
     useEffect(() => {
         localStorage.setItem('chat_history', JSON.stringify(history))
     }, [history])
@@ -45,20 +48,30 @@ function Search() {
         localStorage.setItem('current_messages', JSON.stringify(messages))
     }, [messages])
 
-    const { register, handleSubmit, formState: { errors }, reset } = useForm({
+    // Автоматический плавный скролл вниз
+    useEffect(() => {
+        if (responseAreaRef.current) {
+            responseAreaRef.current.scrollTo({
+                top: responseAreaRef.current.scrollHeight,
+                behavior: 'smooth'
+            })
+        }
+    }, [messages, loader])
+
+    const { register, handleSubmit, formState: { errors }, reset, watch } = useForm({
         resolver: yupResolver(schema)
     })
+
+    const inputValue = watch('info', '')
 
     const onSearch = async (form) => {
         const userMessage = { role: 'user', text: form.info }
         
-       
         setMessages(prev => [...prev, userMessage])
         setLoader(true)
         setError('')
         reset()
 
-        
         let chatId = currentChatId
 
         try {
@@ -70,13 +83,10 @@ function Search() {
             const data = await AiApi.generateAi({ prompt: form.info, history: fullHistory })
             const aiMessage = { role: "assistant", text: data.response }
             
-            
             setMessages(prev => [...prev, aiMessage])
 
-           
             setHistory(prev => {
                 if (!chatId) {
-                   
                     const newChatId = Date.now()
                     setCurrentChatId(newChatId)
                     return [{
@@ -85,7 +95,6 @@ function Search() {
                         dialog: [userMessage, aiMessage]
                     }, ...prev]
                 } else {
-                    
                     return prev.map(chat => 
                         chat.id === chatId 
                             ? { ...chat, dialog: [...chat.dialog, userMessage, aiMessage] }
@@ -101,28 +110,61 @@ function Search() {
         }
     }
 
-    
     const selectChat = (chat) => {
         setMessages(chat.dialog)
         setCurrentChatId(chat.id) 
         setError('')
+        setIsSidebarOpen(false) // Закрываем сайдбар на мобилках после выбора чата
     }
 
     const startNewChat = () => {
         setMessages([])
         setCurrentChatId(null)
         setError('')
+        setIsSidebarOpen(false) // Закрываем сайдбар на мобилках
+    }
+
+    const clearHistory = () => {
+        if (window.confirm("Вы уверены, что хотите полностью очистить всю историю диалогов?")) {
+            setMessages([])
+            setCurrentChatId(null)
+            setHistory([])
+            setError('')
+            localStorage.removeItem('chat_history')
+            localStorage.removeItem('current_chat_id')
+            localStorage.removeItem('current_messages')
+            setIsSidebarOpen(false)
+        }
     }
 
     return (
         <div className="search-container">
             
-            <aside className="search-sidebar">
+            {/* КНОПКА ГАМБУРГЕРА ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ */}
+            <button 
+                className={`mobile-menu-toggle ${isSidebarOpen ? 'active' : ''}`} 
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                aria-label="Открыть историю"
+            >
+                <div className="bar1"></div>
+                <div className="bar2"></div>
+                <div className="bar3"></div>
+            </button>
+
+            {/* ТЕМНАЯ ПОДЛОЖКА ДЛЯ ЗАКРЫТИЯ САЙДБАРА ПО КЛИКУ ВНЕ ЕГО */}
+            {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)}></div>}
+            
+            {/* ЛЕВАЯ ПАНЕЛЬ (САЙДБАР) */}
+            <aside className={`search-sidebar ${isSidebarOpen ? 'open' : ''}`}>
                 <div className="search-sidebar-header">
                     <button onClick={startNewChat} className="new-chat-btn">
-                        ➕ Новая беседа
+                        <svg className="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://w3.org">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Новая беседа
                     </button>
                 </div>
+                
                 <div className="search-history-list">
                     {history.map((chat) => (
                         <div 
@@ -137,13 +179,26 @@ function Search() {
                         </div>
                     ))}
                 </div>
+
+                {/* КНОПКА ОЧИСТКИ ВНИЗУ САЙДБАРА */}
+                {history.length > 0 && (
+                    <div className="search-sidebar-footer">
+                        <button onClick={clearHistory} className="clear-history-btn">
+                            <svg className="search-icon-trash" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://w3.org">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Очистить историю
+                        </button>
+                    </div>
+                )}
             </aside>
 
-          
+            {/* ОСНОВНОЙ КОНТЕНТ */}
             <main className="search-main-content">
-                <div className="search-response-area">
+                <div className="search-response-area" ref={responseAreaRef}>
                     <div className="search-response-wrapper">
                         
+                        {/* Экран приветствия */}
                         {messages.length === 0 && !loader && (
                             <div className="search-welcome-zone">
                                 <h1 className="search-welcome-title">Чем я могу помочь?</h1>
@@ -151,27 +206,35 @@ function Search() {
                             </div>
                         )}
 
+                        {/* Список сообщений */}
                         <div className="chat-messages-list">
                             {messages.map((msg, index) => (
                                 <div key={index} className={`message-bubble ${msg.role}`}>
                                     <div className="message-badge">
                                         {msg.role === 'user' ? 'Вы' : 'Ответ ИИ'}
                                     </div>
-                                    <div className="search-result-text">{msg.text}</div>
+                                    <div className="search-result-text">
+                                        {msg.role === 'user' ? (
+                                            msg.text
+                                        ) : (
+                                            <ReactMarkdown>{msg.text}</ReactMarkdown>
+                                        )}
+                                    </div>
                                 </div>
                             ))}
                         </div>
 
+                        {/* Анимация загрузки */}
                         {loader && (
                             <div className="search-loader-zone">
                                 <Loader />
-                                <span>ИИ генерирует ответ...</span>
+                                <span>Анализирую архитектуру и генерирую блоки кода...</span>
                             </div>
                         )}
                     </div>
                 </div>
 
-                
+                {/* НИЖНЯЯ ПАНЕЛЬ С ИНПУТОМ */}
                 <div className="search-input-area">
                     <div className="search-form-container">
                         <form onSubmit={handleSubmit(onSearch)}>
@@ -185,7 +248,7 @@ function Search() {
                                 />   
                                 <button 
                                     type="submit"
-                                    disabled={loader}
+                                    disabled={loader || !inputValue.trim()}
                                     className="search-submit-button"
                                 >
                                     <svg xmlns="http://w3.org" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="search-icon">
